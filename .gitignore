@@ -1,0 +1,14 @@
+*.exe
+*.sublime-workspace
+*.pdb
+*.raddbgi
+*.dll
+*.exp
+*.rdi
+*.lib
+log.txt
+*.bin
+*.dylib
+*.so
+*.dSYM
+linux

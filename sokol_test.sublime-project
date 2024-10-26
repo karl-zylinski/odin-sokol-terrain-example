@@ -1,0 +1,42 @@
+{
+	"folders":
+	[
+		{
+			"path": ".",
+		},
+		{
+			"path": "C:\\Odin\\base",
+		},
+		{
+			"path": "C:\\Odin\\core",
+		},
+		{
+			"path": "C:\\Odin\\examples\\demo"
+		},
+		{
+			"path": "C:\\Odin\\vendor\\cgltf"
+		},
+		{
+			"path": "C:\\Odin\\vendor\\stb"
+		},
+	],
+	"build_systems":
+	[
+		{
+			"name": "sokol_test",
+			"cmd": "build.bat",
+			"file_regex": "^(.+)\\(([0-9]+):([0-9]+)\\) (.+)$",
+		}
+	],
+	"settings":
+	{
+		"auto_complete": false,
+		"LSP":
+		{
+			"odin":
+			{
+				"enabled": true,
+			},
+		},
+	},
+}
