@@ -117,7 +117,9 @@ frame :: proc "c" () {
 	sg.apply_pipeline(state.pip)
 	sg.apply_bindings(state.bind)
 
+	time += sapp.frame_duration()
 	t := f32(sapp.frame_duration())
+
 
 	movement: Vec3
 
@@ -144,6 +146,7 @@ frame :: proc "c" () {
 
 	vs_params := Vs_Params {
 		mvp = compute_view_proj(),
+		time = f32(time),
 	}
 
 	yaw -= mouse_move.x * t * 0.5
@@ -163,6 +166,7 @@ vec4_point :: proc(v: Vec3) -> Vec4 {
 Vec3 :: [3]f32
 Vec4 :: [4]f32
 Mat4 :: matrix[4,4]f32
+time: f64
 
 yaw: f32
 pitch: f32
@@ -232,6 +236,11 @@ event :: proc "c" (e: ^sapp.Event) {
 				key_held[.Right] = false
 			}
 
+		case .FOCUSED:
+			sapp.lock_mouse(true)
+
+		case .UNFOCUSED:
+			sapp.lock_mouse(false)
 	}
 }
 

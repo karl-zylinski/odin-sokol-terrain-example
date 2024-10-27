@@ -6,6 +6,7 @@
 @vs vs
 uniform vs_params {
     mat4 mvp;
+    float time;
 };
 
 uniform texture2D tex;
@@ -25,7 +26,7 @@ void main() {
     float h = texture(sampler2D(tex, smp), texcoord).r;
     gl_Position = mvp * position;
     height = h;
-    gl_Position.y += h*30;
+    gl_Position.y += h*30 + 10*sin((time*10+position.x)/5);
 }
 @end
 
