@@ -1,8 +1,3 @@
-//------------------------------------------------------------------------------
-//  triangle/main.odin
-//
-//  Hello Triangle sample.
-//------------------------------------------------------------------------------
 package game
 
 import "base:runtime"
@@ -31,9 +26,11 @@ Vertex :: struct {
 	u, v: u16,
 }
 
+default_context: runtime.Context
+
 init :: proc "c" () {
+	context = default_context
 	pos = {0, 5, -6}
-	context = runtime.default_context()
 
 	sg.setup({
 		environment = sglue.environment(),
@@ -105,21 +102,19 @@ init :: proc "c" () {
 			0 = { load_action = .CLEAR, clear_value = { 0.2, 0.4, 0.6, 1.0 } },
 		},
 	}
-
-	sapp.lock_mouse(true)
 }
 
 pos: Vec3
 
 frame :: proc "c" () {
-	context = runtime.default_context()
+	context = default_context
+
 	sg.begin_pass({ action = state.pass_action, swapchain = sglue.swapchain() })
 	sg.apply_pipeline(state.pip)
 	sg.apply_bindings(state.bind)
 
 	time += sapp.frame_duration()
 	t := f32(sapp.frame_duration())
-
 
 	movement: Vec3
 
@@ -139,9 +134,7 @@ frame :: proc "c" () {
 		movement.x-= 1
 	}
 
-
 	rot := linalg.matrix4_from_yaw_pitch_roll_f32(yaw, pitch, 0)
-
 	pos += linalg.mul(rot, vec4_point(linalg.normalize0(movement)*t*50)).xyz
 
 	vs_params := Vs_Params {
@@ -149,8 +142,18 @@ frame :: proc "c" () {
 		time = f32(time),
 	}
 
-	yaw -= mouse_move.x * t * 0.5
-	pitch += mouse_move.y * t * 0.5
+	if mouse_held[.Right] {
+		yaw -= mouse_move.x * t * 0.3
+		pitch += mouse_move.y * t * 0.3
+
+		if !sapp.mouse_locked() {
+			sapp.lock_mouse(true)
+		}
+	} else {
+		if sapp.mouse_locked() {
+			sapp.lock_mouse(false)
+		}
+	}
 
 	sg.apply_uniforms(.VS, SLOT_vs_params, { ptr = &vs_params, size = size_of(vs_params)} )
 	sg.draw(0, 100000, 1)
@@ -181,7 +184,7 @@ compute_view_proj :: proc () -> Mat4 {
 }
 
 cleanup :: proc "c" () {
-	context = runtime.default_context()
+	context = default_context
 	sg.shutdown()
 }
 
@@ -193,10 +196,17 @@ Key :: enum {
 }
 
 key_held: [Key]bool
+
+Mouse_Button :: enum {
+	Left,
+	Right,
+}
+
+mouse_held: [Mouse_Button]bool
 mouse_move: [2]f32
 
 event :: proc "c" (e: ^sapp.Event) {
-	context = runtime.default_context()
+	context = default_context
 
 	#partial switch e.type {
 		case .MOUSE_MOVE: 
@@ -236,15 +246,30 @@ event :: proc "c" (e: ^sapp.Event) {
 				key_held[.Right] = false
 			}
 
-		case .FOCUSED:
-			sapp.lock_mouse(true)
+		case .MOUSE_DOWN:
+			if e.mouse_button == .LEFT {
+				mouse_held[.Left] = true
+			}
 
-		case .UNFOCUSED:
-			sapp.lock_mouse(false)
+			if e.mouse_button == .RIGHT {
+				mouse_held[.Right] = true
+			}
+
+
+		case .MOUSE_UP:
+			if e.mouse_button == .LEFT {
+				mouse_held[.Left] = false
+			}
+
+			if e.mouse_button == .RIGHT {
+				mouse_held[.Right] = false
+			}
 	}
 }
 
 main :: proc() {
+	default_context = context
+
 	sapp.run({
 		init_cb = init,
 		frame_cb = frame,
@@ -253,7 +278,7 @@ main :: proc() {
 		width = 1280,
 		height = 720,
 		high_dpi = true,
-		window_title = "triangle",
+		window_title = "Landscapin",
 		icon = { sokol_default = true },
 		logger = { func = slog.func },
 	})

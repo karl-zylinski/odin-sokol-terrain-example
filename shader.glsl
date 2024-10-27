@@ -26,7 +26,8 @@ void main() {
     float h = texture(sampler2D(tex, smp), texcoord).r;
     gl_Position = mvp * position;
     height = h;
-    gl_Position.y += h*30 + 10*sin((time*10+position.x)/5);
+    color = vec4(h,h,h,1);
+    gl_Position.y += h*30;
 }
 @end
 
@@ -38,7 +39,7 @@ in float height;
 out vec4 frag_color;
 
 void main() {
-    frag_color = vec4(0.3, height*0.5+0.3, 0.3, 1);
+    frag_color = clamp(vec4(0.3, 0.6, 0.3, 1) * color + vec4(0, 0.1, 0, 0), 0, 1);
 }
 @end
 
