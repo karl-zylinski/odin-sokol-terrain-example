@@ -13,3 +13,5 @@ log.txt
 *.dSYM
 linux
 shader.odin
+*.afphoto~lock~
+!sokol-shdc.exe
