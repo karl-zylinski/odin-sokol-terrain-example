@@ -1,3 +1,6 @@
+// SOKOL example that has loads and displays a heightmap (heightmap.png). There
+// is also a free-fly camera (hold right mouse button to rotate camera).
+
 package game
 
 import "base:runtime"
@@ -8,10 +11,8 @@ import sglue "sokol/glue"
 import sshape "sokol/shape"
 
 import "core:math/linalg"
-import "core:fmt"
 import "core:os"
 import "core:c"
-import "core:math"
 
 import stbi "vendor:stb/image"
 
@@ -131,7 +132,7 @@ frame :: proc "c" () {
 	}
 
 	if key_held[.Right] {
-		movement.x-= 1
+		movement.x -= 1
 	}
 
 	rot := linalg.matrix4_from_yaw_pitch_roll_f32(yaw, pitch, 0)
